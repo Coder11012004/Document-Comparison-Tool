@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Insight Tool</title>    
+    <style>
+        body{ 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f4f4f4;
+            margin: 20px;
+        }
+
+        .container{
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            margin: auto;
+        }
+
+        h1{ 
+            color: #333; 
+            margin-bottom: 20px;
+        }
+
+        .table-wrapper{
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 600px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: max-content; 
+            border-collapse: collapse;
+            white-space: nowrap; 
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        th{
+            background-color: #f0c74b;
+            color: black;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        td{
+            background-color: #fafafa;
+        }
+
+        tr:nth-child(even) td{
+            background-color: #f9f9f9;
+        }
+
+        .button{
+            margin-top: 20px;
+            background-color: #f0c74b;
+            color: black;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.2s ease;
+        }
+
+        .button:hover{
+            background-color: #d9a900;
+        }
+
+        body{
+            background-image: url('../static/2.webp');
+            background-size: cover;
+            background-position: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .filter-form{
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        input[type="number"]{
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100px;
+            text-align: center;
+        }
+
+        button{
+            padding: 8px 12px;
+            background-color: #f0c74b;
+            color: black;
+            border: none;   
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover{
+            background-color: #D9A900;
+        }
+
+        td:first-child {
+            background-color: #f0c74b !important;
+            font-weight: bold;
+        }
+
+        .error-message{
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Comparison Results</h1>
+
+        <form action="{{ url_for('filter_results') }}" method="get">
+            <label for="min_similarity">Min Similarity:</label>
+            <input type="number" name="min_similarity" id="min_similarity" value="{{ min_similarity }}" step="1" min="0" max="100">
+            
+            <label for="max_similarity">Max Similarity:</label>
+            <input type="number" name="max_similarity" id="max_similarity" value="{{ max_similarity }}" step="1" min="0" max="100">
+        
+            <label for="remove_words">Remove Words:</label>
+            <input type="text" name="remove_words" id="remove_words"  value="{{ remove_words|default('') }}">
+            
+            <button type="submit">Apply</button>
+        </form>
+
+        {% if matrix %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>File name</th>
+                        {% for file2 in matrix.keys() %}
+                            <th>{{ file2 }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file1, row in matrix.items() %}
+                        <tr>
+                            <td>{{ file1 }}</td>
+                            {% for file2 in matrix.keys() %}
+                                {% set value = row.get(file2) %}
+                                {% if value != "" %}
+                                    <td style="background-color: #fcefca;">{{ value }}</td>
+                                {% else %}
+                                    <td></td> 
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="error-message">No results found.</p>
+        {% endif %}
+
+
+        <a href="{{ url_for('download_file', min_similarity=min_similarity) }}" class="button">
+            Download .xlsx
+        </a>
+
+        <a href="/" class="button">Back to Home</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    <title>PDF Insight Tool</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1{
+            color: #ffffff;
+            font-size: xx-large;
+            margin-bottom: 20px;
+        }
+
+        form{
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            align-items: center;
+
+        }
+
+        input[type="file"]{
+            display: block;
+            padding: 5px;
+        }
+
+        input[type="submit"]{
+            align-items: center;
+            background-color: #D9A900;
+            color: rgb(0, 0, 0);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover{
+            background-color: #f0c74b;
+        }
+
+        input[type="file"]{
+            appearance: button;
+            background-color: #D9A900;
+            border: solid transparent;
+            border-radius: 16px;
+            border-width: 0 0 4px;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            display: inline-block;
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            line-height: 20px;
+            margin: 0;
+            outline: none;
+            overflow: visible;
+            padding: 13p
+        }
+
+        body{
+            background-image: url('../static/2.webp');
+            background-size: cover;
+            background-position: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .logo{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 100px;  
+            height: auto;
+        }
+
+        footer{
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 14px;
+        }
+
+        footer a{
+            color: #D9A900;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover{
+            text-decoration: underline;
+        }
+    </style>
+
+</head>
+<body>
+    <img src="{{ url_for('static', filename='ey.png') }}" alt="Logo" class="logo">
+
+    <h1>Document Comparison Tool</h1>
+
+    <form method='POST' enctype='multipart/form-data'>
+        {{ form.hidden_tag() }}
+        {{ form.zipfile() }}
+        {{ form.submit() }}
+    </form>    
+        
+    {% if results %}
+        <h1>PDF Comparison Results</h1>
+        <table border="1">
+        <tr>
+            <th>PDF 1</th>
+            <th>PDF 2</th>
+            <th>Similarity Ratio</th>
+        </tr>
+        {% for pdf1, pdf2, ratio in results %}
+        <tr>
+            <td>{{ pdf1 }}</td>
+            <td>{{ pdf2 }}</td>
+            <td>{{ ratio }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    <br>
+    {% else %}
+        <p>Upload a ZIP file to compare and check the similarity between files.</p>
+    {% endif %}
+
+    {% if session.get('user') %}
+        <footer>
+            Logged in as {{ session['user'] }} | <a href="{{ url_for('logout') }}">Logout</a>
+        </footer>
+    {% endif %}
+</body>
+</html> 
